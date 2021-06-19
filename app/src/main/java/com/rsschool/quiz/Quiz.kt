@@ -2,16 +2,17 @@ package com.rsschool.quiz
 
 import java.io.Serializable
 
-
 class Quiz (private val questionArray: ArrayList<Question>): Serializable{
+
 
     private val quizQuestions = Array(questionArray.size){
             i -> QuestionStatus(questionArray[i], -1)
     }
     private var currentQuestion = 0
 
-
-
+    fun getQuestionNumber(): Int{
+        return currentQuestion + 1
+    }
 
     fun getCurrentQuestion(): Question{
         return quizQuestions[currentQuestion].question
@@ -23,6 +24,7 @@ class Quiz (private val questionArray: ArrayList<Question>): Serializable{
 
     fun setAnswer(userAnswer: Int){
         quizQuestions[currentQuestion].userAnswer = userAnswer
+
     }
 
     fun moveToNextQuestion(){
@@ -33,6 +35,13 @@ class Quiz (private val questionArray: ArrayList<Question>): Serializable{
         if (currentQuestion > 0){
             --currentQuestion
         }
+    }
+    fun isFirstQuestion(): Boolean{
+        return currentQuestion == 0
+    }
+
+    fun isLastQuestion(): Boolean{
+        return currentQuestion == quizQuestions.lastIndex
     }
 
     fun isTrueAnswer(questionNum: Int): Boolean{
@@ -48,8 +57,15 @@ class Quiz (private val questionArray: ArrayList<Question>): Serializable{
         return true
     }
 
+    fun getResult(): Int{
+        var corractAnswers = 0
+        for (question in quizQuestions){
+            if (question.userAnswer == question.question.answerNum){
+                corractAnswers++
+            }
+        }
+        return  (corractAnswers*100) / quizQuestions.size
+    }
 
-
-
-    private data class QuestionStatus(val question: Question, var userAnswer: Int){}
+    private data class QuestionStatus(val question: Question, var userAnswer: Int)
 }

@@ -1,90 +1,114 @@
 package com.rsschool.quiz
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import com.rsschool.quiz.databinding.FragmentQuizBinding
 
 
 class QuizFragment : Fragment() {
 
-    private lateinit var questionText: TextView
-    private lateinit var radioGroup: RadioGroup
-    private lateinit var optionOneRButton: RadioButton
-    private lateinit var optionTwoRButton: RadioButton
-    private lateinit var optionThreeRButton: RadioButton
-    private lateinit var optionFourRButton: RadioButton
-    private lateinit var optionFiveRButton: RadioButton
-    private lateinit var previousButton: Button
-    private lateinit var nextButton: Button
+    private lateinit var listener: ClickQuizFragmentButtons
+    private var _binding: FragmentQuizBinding? = null
+    private val binding get() = _binding!!
 
     interface ClickQuizFragmentButtons{
         fun clickNextButton(choice: Int)
         fun clickPreviousButton(choice: Int)
     }
 
-    private lateinit var listener: ClickQuizFragmentButtons
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         if (context is ClickQuizFragmentButtons){
             listener = context as ClickQuizFragmentButtons
         }
-        return inflater.inflate(R.layout.fragment_quiz, container, false)
+        _binding = FragmentQuizBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        questionText = view.findViewById(R.id.question)
-        radioGroup = view.findViewById(R.id.radio_group)
-        optionOneRButton = view.findViewById(R.id.option_one)
-        optionTwoRButton = view.findViewById(R.id.option_two)
-        optionThreeRButton = view.findViewById(R.id.option_three)
-        optionFourRButton = view.findViewById(R.id.option_four)
-        optionFiveRButton = view.findViewById(R.id.option_five)
-        previousButton = view.findViewById(R.id.previous_button)
-        nextButton = view.findViewById(R.id.next_button)
+        binding.question.text = arguments?.getString(ARG_QUESTION)
+        binding.optionOne.text = arguments?.getString(OPTION_ONE)
+        binding.optionTwo.text = arguments?.getString(OPTION_TWO)
+        binding.optionThree.text = arguments?.getString(OPTION_THREE)
+        binding.optionFour.text = arguments?.getString(OPTION_FOUR)
+        binding.optionFive.text = arguments?.getString(OPTION_FIVE)
 
-        questionText.text = arguments?.getString(ARG_QUESTION)
-        optionOneRButton.text = arguments?.getString(OPTION_ONE)
-        optionTwoRButton.text = arguments?.getString(OPTION_TWO)
-        optionThreeRButton.text = arguments?.getString(OPTION_THREE)
-        optionFourRButton.text = arguments?.getString(OPTION_FOUR)
-        optionFiveRButton.text = arguments?.getString(OPTION_FIVE)
-
-//        radioGroup.setOnCheckedChangeListener { arg0, selectedId ->
-//            var selectedId = selectedId
-//            selectedId = genderselected.getCheckedRadioButtonId()
-//            val genderchoosed = findViewById(selectedId) as RadioButton
-//            val gender = genderchoosed.text.toString()
-//        }
-
-
-        previousButton.setOnClickListener {
-            listener.clickPreviousButton(radioGroup.checkedRadioButtonId)
+        binding.radioGroup.setOnCheckedChangeListener{ _, idButton ->
+            if(idButton != -1){
+                activateButton(binding.nextButton)
+            }
         }
 
-        nextButton.setOnClickListener {
-            listener.clickNextButton(radioGroup.checkedRadioButtonId)
+        binding.previousButton.setOnClickListener {
+            listener.clickPreviousButton(binding.radioGroup.checkedRadioButtonId)
+        }
+
+        binding.nextButton.setOnClickListener {
+            listener.clickNextButton(binding.radioGroup.checkedRadioButtonId)
         }
 
     }
 
-    fun refreshFragment(question: String, option_one: String, option_two: String, option_three: String, option_four: String, option_five: String, userChoice: Int){
-        questionText.text = question
-        radioGroup.check(userChoice)
-        optionOneRButton.text = option_one
-        optionTwoRButton.text = option_two
-        optionThreeRButton.text = option_three
-        optionFourRButton.text = option_four
-        optionFiveRButton.text = option_five
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    @SuppressLint("ResourceAsColor")
+    fun refreshFragment(question: String,
+                        option_one: String,
+                        option_two: String,
+                        option_three: String,
+                        option_four: String,
+                        option_five: String,
+                        userChoice: Int,
+                        firstQuestion: Boolean,
+                        lastQuestion: Boolean){
+        binding.question.text = question
+        binding.radioGroup.check(userChoice)
+        binding.optionOne.text = option_one
+        binding.optionTwo.text = option_two
+        binding.optionThree.text = option_three
+        binding.optionFour.text = option_four
+        binding.optionFive.text = option_five
+        if(!firstQuestion) {
+            activateButton(binding.previousButton)
+        } else {
+            deActivateButton(binding.previousButton)
+        }
+        if(userChoice != -1){
+            activateButton(binding.nextButton)
+        } else{
+            deActivateButton(binding.nextButton)
+        }
+        if (lastQuestion){
+            binding.nextButton.text = "SUBMIT"
+        } else {
+            binding.nextButton.text = "NEXT"
+        }
     }
 
 
+    /////////////////////////////////////////////////////////////
+    //////ACTIVATED
+    private fun activateButton(button: Button){
+        button.isEnabled = true
+        button.isEnabled = true
+    }
+
+    private fun deActivateButton(button: Button){
+        button.isActivated = false
+        button.isEnabled = false
+    }
+    ///////////////////////////////////////////////////////////
 
     companion object {
         @JvmStatic

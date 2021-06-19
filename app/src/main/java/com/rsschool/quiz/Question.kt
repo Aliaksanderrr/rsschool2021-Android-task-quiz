@@ -1,15 +1,17 @@
 package com.rsschool.quiz
 
+import java.io.Serializable
+
 data class Question (val question: String,
                      val variant1 : String,
                      val variant2 : String,
                      val variant3 : String,
                      val variant4 : String,
                      val variant5 : String,
-                     val answerNum: Int) {
+                     val answerNum: Int) : Serializable{
 }
 
-class QuestionsPool(){
+class QuestionsPool(): Serializable{
 
     companion object{
         private val pool = arrayListOf(
