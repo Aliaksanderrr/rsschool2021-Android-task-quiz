@@ -17,6 +17,7 @@ class QuizFragment : Fragment() {
     private var _binding: FragmentQuizBinding? = null
     private val binding get() = _binding!!
     private var navigationIcon: Drawable? = null
+    private var toolbartitle  = "Question "
 
     interface ClickQuizFragmentButtons{
         fun clickNextButton(choice: Int)
@@ -80,7 +81,8 @@ class QuizFragment : Fragment() {
                         option_five: String,
                         userChoice: Int,
                         firstQuestion: Boolean,
-                        lastQuestion: Boolean){
+                        lastQuestion: Boolean,
+                        numOfQuestion: Int){
         binding.question.text = question
         binding.radioGroup.check(userChoice)
         binding.optionOne.text = option_one
@@ -88,6 +90,7 @@ class QuizFragment : Fragment() {
         binding.optionThree.text = option_three
         binding.optionFour.text = option_four
         binding.optionFive.text = option_five
+        binding.toolbar.title = toolbartitle + numOfQuestion
         if(!firstQuestion) {
             activateButton(binding.previousButton)
             binding.toolbar.isActivated = true

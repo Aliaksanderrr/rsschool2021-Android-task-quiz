@@ -128,8 +128,8 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons,
             question.variant5,
             converterAnswerToRButtonId(quiz.getAnswer()),
             quiz.isFirstQuestion(),
-            quiz.isLastQuestion())
-
+            quiz.isLastQuestion(),
+            quiz.getQuestionNumber())
     }
 
     private fun converterRButtonsIdToAnswer(rButtonId: Int): Int{
