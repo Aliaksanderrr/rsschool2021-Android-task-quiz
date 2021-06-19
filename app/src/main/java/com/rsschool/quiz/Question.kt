@@ -9,6 +9,7 @@ data class Question (val question: String,
                      val variant4 : String,
                      val variant5 : String,
                      val answerNum: Int) : Serializable{
+
 }
 
 class QuestionsPool(): Serializable{

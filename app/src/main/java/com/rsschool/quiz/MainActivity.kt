@@ -1,8 +1,10 @@
 package com.rsschool.quiz
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import android.widget.RadioGroup
 import android.widget.Toast
 import com.rsschool.quiz.databinding.ActivityMainBinding
 
@@ -13,10 +15,15 @@ window?.statusBarColor = Color.Red
 private const val NUMBER_OF_QUESTIONS = 3
 private const val KEY_QUIZ_INSTANCE = "quiz instance"
 
-class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons {
+enum class ActualFragment{
+    QUIZ, SUBMIT;
+}
+
+class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons, SubmitFragment.ClickSubmitFragmentButtons {
 
     private var quiz = Quiz(QuestionsPool.getQuestions(NUMBER_OF_QUESTIONS))
     private lateinit var binding: ActivityMainBinding
+    private var actualFragment: ActualFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +39,21 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons 
         outState.putSerializable(KEY_QUIZ_INSTANCE, quiz)
     }
 
-    private fun  openQuizFragment() {
+    override fun onBackPressed() {
+        when(actualFragment){
+            ActualFragment.QUIZ -> {
+                if (quiz.isFirstQuestion()){
+                    super.onBackPressed()
+                } else {
+                    clickPreviousButton(findViewById<RadioGroup>(R.id.radio_group).checkedRadioButtonId)
+                }
+            }
+            ActualFragment.SUBMIT -> clickBackButton()
+            else -> super.onBackPressed()
+        }
+    }
+
+    private fun openQuizFragment() {
         val question = quiz.getCurrentQuestion()
         val quizFragment = QuizFragment.newInstance(question.question,
                                                     question.variant1,
@@ -43,6 +64,7 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons 
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.quiz_fragment_container, quizFragment)
         transaction.commit()
+        actualFragment = ActualFragment.QUIZ
     }
 
     private fun openSubmitFragment(){
@@ -50,6 +72,7 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons 
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.quiz_fragment_container, submitFragment)
         transaction.commit()
+        actualFragment = ActualFragment.SUBMIT
     }
 
     override fun clickNextButton(choice: Int) {
@@ -67,6 +90,30 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons 
         quiz.moveToPreviousQuestion()
         refreshFragment()
     }
+
+    override fun clickShareButton() {
+        val textMessage = quiz.getStringResult()
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, textMessage)
+            type = "text/plain"
+        }
+        try {
+            startActivity(sendIntent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, "App not found for sharing result", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun clickBackButton() {
+        quiz = Quiz(QuestionsPool.getQuestions(NUMBER_OF_QUESTIONS))
+        openQuizFragment()
+    }
+
+    override fun clickExitButton() {
+        finish()
+    }
+
 
     private fun refreshFragment(){
         val fragment = supportFragmentManager.findFragmentById(R.id.quiz_fragment_container) as QuizFragment
@@ -97,7 +144,7 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons 
     }
 
     private fun converterAnswerToRButtonId(buttonNum: Int): Int {
-        return when(buttonNum){
+        return when (buttonNum) {
             1 -> R.id.option_one
             2 -> R.id.option_two
             3 -> R.id.option_three
@@ -106,4 +153,5 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons 
             else -> -1
         }
     }
+
 }

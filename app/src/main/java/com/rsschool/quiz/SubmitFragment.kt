@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.rsschool.quiz.databinding.FragmentSubmitBinding
 
@@ -24,7 +23,7 @@ class SubmitFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         if (context is ClickSubmitFragmentButtons){
             listener = context as ClickSubmitFragmentButtons
         }
@@ -38,22 +37,18 @@ class SubmitFragment: Fragment() {
         binding.quizResult.text = "Your result: $res %"
 
         binding.share.setOnClickListener {
-            //TODO
-            Toast.makeText(context, "Share was pressed", Toast.LENGTH_SHORT).show()
+            listener.clickShareButton()
         }
 
         binding.back.setOnClickListener {
-            //TODO
-            Toast.makeText(context, "Share was pressed", Toast.LENGTH_SHORT).show()
+            activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
+            listener.clickBackButton()
         }
 
         binding.exit.setOnClickListener {
-            //TODO
-            Toast.makeText(context, "Share was pressed", Toast.LENGTH_SHORT).show()
+            listener.clickExitButton()
         }
-
     }
-
 
     companion object{
         @JvmStatic

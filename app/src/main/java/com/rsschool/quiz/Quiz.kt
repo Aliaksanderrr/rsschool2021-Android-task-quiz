@@ -67,5 +67,24 @@ class Quiz (private val questionArray: ArrayList<Question>): Serializable{
         return  (corractAnswers*100) / quizQuestions.size
     }
 
+    fun getStringResult(): String{
+        var result = "Your result: ${getResult()} %\n"
+        var counter = 1
+        for (question in quizQuestions){
+            result += "\n$counter) ${question.question.question}"
+            val ans = when (question.userAnswer){
+                1 -> question.question.variant1
+                2 -> question.question.variant2
+                3 -> question.question.variant3
+                4 -> question.question.variant4
+                5 -> question.question.variant5
+                else -> "no answer"
+            }
+            result += "\nYour answer:$ans\n"
+            counter++
+        }
+        return result
+    }
+
     private data class QuestionStatus(val question: Question, var userAnswer: Int)
 }

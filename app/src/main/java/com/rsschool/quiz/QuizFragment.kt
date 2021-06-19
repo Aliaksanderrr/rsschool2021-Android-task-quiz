@@ -57,12 +57,13 @@ class QuizFragment : Fragment() {
 
     }
 
+
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    @SuppressLint("ResourceAsColor")
     fun refreshFragment(question: String,
                         option_one: String,
                         option_two: String,
