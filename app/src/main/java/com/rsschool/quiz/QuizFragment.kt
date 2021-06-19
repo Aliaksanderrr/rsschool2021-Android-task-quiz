@@ -1,6 +1,7 @@
 package com.rsschool.quiz
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ class QuizFragment : Fragment() {
     private lateinit var listener: ClickQuizFragmentButtons
     private var _binding: FragmentQuizBinding? = null
     private val binding get() = _binding!!
+    private var navigationIcon: Drawable? = null
 
     interface ClickQuizFragmentButtons{
         fun clickNextButton(choice: Int)
@@ -40,6 +42,9 @@ class QuizFragment : Fragment() {
         binding.optionThree.text = arguments?.getString(OPTION_THREE)
         binding.optionFour.text = arguments?.getString(OPTION_FOUR)
         binding.optionFive.text = arguments?.getString(OPTION_FIVE)
+        navigationIcon = binding.toolbar.navigationIcon
+        binding.toolbar.navigationIcon =null
+
 
         binding.radioGroup.setOnCheckedChangeListener{ _, idButton ->
             if(idButton != -1){
@@ -55,6 +60,9 @@ class QuizFragment : Fragment() {
             listener.clickNextButton(binding.radioGroup.checkedRadioButtonId)
         }
 
+        binding.toolbar.setOnClickListener {
+            listener.clickPreviousButton(binding.radioGroup.checkedRadioButtonId)
+        }
     }
 
 
@@ -82,8 +90,14 @@ class QuizFragment : Fragment() {
         binding.optionFive.text = option_five
         if(!firstQuestion) {
             activateButton(binding.previousButton)
+            binding.toolbar.isActivated = true
+            binding.toolbar.isEnabled = true
+            binding.toolbar.navigationIcon = navigationIcon
         } else {
             deActivateButton(binding.previousButton)
+            binding.toolbar.isActivated = false
+            binding.toolbar.isEnabled = false
+            binding.toolbar.navigationIcon = null
         }
         if(userChoice != -1){
             activateButton(binding.nextButton)
@@ -101,7 +115,6 @@ class QuizFragment : Fragment() {
     /////////////////////////////////////////////////////////////
     //////ACTIVATED
     private fun activateButton(button: Button){
-        button.isEnabled = true
         button.isEnabled = true
     }
 
