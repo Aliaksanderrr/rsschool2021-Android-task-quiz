@@ -1,7 +1,10 @@
 package com.rsschool.quiz
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.res.Resources
+import android.content.res.loader.ResourcesProvider
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.RadioGroup
@@ -24,6 +27,11 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons,
     private var quiz = Quiz(QuestionsPool.getQuestions(NUMBER_OF_QUESTIONS))
     private lateinit var binding: ActivityMainBinding
     private var actualFragment: ActualFragment? = null
+    private val themesPool = listOf(R.style.Theme_Quiz_First,
+                                    R.style.Theme_Quiz_Second,
+                                    R.style.Theme_Quiz_Third,
+                                    R.style.Theme_Quiz_Fourth,
+                                    R.style.Theme_Quiz_Fifth)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,13 +62,18 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons,
     }
 
     private fun openQuizFragment() {
+        setTheme(themesPool[quiz.getQuestionNumber()-1])
         val question = quiz.getCurrentQuestion()
         val quizFragment = QuizFragment.newInstance(question.question,
                                                     question.variant1,
                                                     question.variant2,
                                                     question.variant3,
                                                     question.variant4,
-                                                    question.variant5)
+                                                    question.variant5,
+                                                    converterAnswerToRButtonId(quiz.getAnswer()),
+                                                    quiz.isFirstQuestion(),
+                                                    quiz.isLastQuestion(),
+                                                    quiz.getQuestionNumber())
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.quiz_fragment_container, quizFragment)
         transaction.commit()
@@ -75,20 +88,21 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons,
         actualFragment = ActualFragment.SUBMIT
     }
 
+    @SuppressLint("ResourceType")
     override fun clickNextButton(choice: Int) {
         quiz.setAnswer(converterRButtonsIdToAnswer(choice))
         if (quiz.isLastQuestion() && quiz.isQuizFinish()){
             openSubmitFragment()
         } else{
             quiz.moveToNextQuestion()
-            refreshFragment()
+            openQuizFragment()
         }
     }
 
     override fun clickPreviousButton(choice: Int) {
         quiz.setAnswer(converterRButtonsIdToAnswer(choice))
         quiz.moveToPreviousQuestion()
-        refreshFragment()
+        openQuizFragment()
     }
 
     override fun clickShareButton() {
@@ -112,24 +126,6 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons,
 
     override fun clickExitButton() {
         finish()
-    }
-
-
-    private fun refreshFragment(){
-        val fragment = supportFragmentManager.findFragmentById(R.id.quiz_fragment_container) as QuizFragment
-        val question = quiz.getCurrentQuestion()
-
-        fragment.refreshFragment(
-            question.question,
-            question.variant1,
-            question.variant2,
-            question.variant3,
-            question.variant4,
-            question.variant5,
-            converterAnswerToRButtonId(quiz.getAnswer()),
-            quiz.isFirstQuestion(),
-            quiz.isLastQuestion(),
-            quiz.getQuestionNumber())
     }
 
     private fun converterRButtonsIdToAnswer(rButtonId: Int): Int{

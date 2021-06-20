@@ -1,6 +1,6 @@
 package com.rsschool.quiz
 
-import android.annotation.SuppressLint
+import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -43,8 +43,34 @@ class QuizFragment : Fragment() {
         binding.optionThree.text = arguments?.getString(OPTION_THREE)
         binding.optionFour.text = arguments?.getString(OPTION_FOUR)
         binding.optionFive.text = arguments?.getString(OPTION_FIVE)
+
+        /////////////////////////////////////////////
+        binding.radioGroup.check(arguments?.getInt(USER_CHOISE)!!)
         navigationIcon = binding.toolbar.navigationIcon
-        binding.toolbar.navigationIcon =null
+        binding.toolbar.title = toolbartitle + arguments?.getInt(NUM_OF_QUESTION)
+        if(!arguments?.getBoolean(FIRST_QUESTION)!!) {
+            activateButton(binding.previousButton)
+            binding.toolbar.isActivated = true
+            binding.toolbar.isEnabled = true
+            binding.toolbar.navigationIcon = navigationIcon
+        } else {
+            deActivateButton(binding.previousButton)
+            binding.toolbar.isActivated = false
+            binding.toolbar.isEnabled = false
+            binding.toolbar.navigationIcon = null
+        }
+        if(arguments?.getInt(USER_CHOISE) != -1){
+            activateButton(binding.nextButton)
+        } else{
+            deActivateButton(binding.nextButton)
+        }
+        if (arguments?.getBoolean(LAST_QUESTION)!!){
+            binding.nextButton.text = "SUBMIT"
+        } else {
+            binding.nextButton.text = "NEXT"
+        }
+
+        /////////////////////////////////////////////
 
 
         binding.radioGroup.setOnCheckedChangeListener{ _, idButton ->
@@ -73,48 +99,6 @@ class QuizFragment : Fragment() {
         _binding = null
     }
 
-    fun refreshFragment(question: String,
-                        option_one: String,
-                        option_two: String,
-                        option_three: String,
-                        option_four: String,
-                        option_five: String,
-                        userChoice: Int,
-                        firstQuestion: Boolean,
-                        lastQuestion: Boolean,
-                        numOfQuestion: Int){
-        binding.question.text = question
-        binding.radioGroup.check(userChoice)
-        binding.optionOne.text = option_one
-        binding.optionTwo.text = option_two
-        binding.optionThree.text = option_three
-        binding.optionFour.text = option_four
-        binding.optionFive.text = option_five
-        binding.toolbar.title = toolbartitle + numOfQuestion
-        if(!firstQuestion) {
-            activateButton(binding.previousButton)
-            binding.toolbar.isActivated = true
-            binding.toolbar.isEnabled = true
-            binding.toolbar.navigationIcon = navigationIcon
-        } else {
-            deActivateButton(binding.previousButton)
-            binding.toolbar.isActivated = false
-            binding.toolbar.isEnabled = false
-            binding.toolbar.navigationIcon = null
-        }
-        if(userChoice != -1){
-            activateButton(binding.nextButton)
-        } else{
-            deActivateButton(binding.nextButton)
-        }
-        if (lastQuestion){
-            binding.nextButton.text = "SUBMIT"
-        } else {
-            binding.nextButton.text = "NEXT"
-        }
-    }
-
-
     /////////////////////////////////////////////////////////////
     //////ACTIVATED
     private fun activateButton(button: Button){
@@ -129,7 +113,16 @@ class QuizFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(question: String, option_one: String, option_two: String, option_three: String, option_four: String, option_five: String): QuizFragment{
+        fun newInstance(question: String,
+                        option_one: String,
+                        option_two: String,
+                        option_three: String,
+                        option_four: String,
+                        option_five: String,
+                        userChoice: Int,
+                        firstQuestion: Boolean,
+                        lastQuestion: Boolean,
+                        numOfQuestion: Int): QuizFragment{
            val fragment = QuizFragment()
             fragment.arguments = Bundle().apply {
                 putString(ARG_QUESTION, question)
@@ -138,6 +131,10 @@ class QuizFragment : Fragment() {
                 putString(OPTION_THREE, option_three)
                 putString(OPTION_FOUR, option_four)
                 putString(OPTION_FIVE, option_five)
+                putInt(USER_CHOISE, userChoice)
+                putBoolean(FIRST_QUESTION, firstQuestion)
+                putBoolean(LAST_QUESTION, lastQuestion)
+                putInt(NUM_OF_QUESTION, numOfQuestion)
             }
             return fragment
         }
@@ -148,6 +145,10 @@ class QuizFragment : Fragment() {
         private const val OPTION_THREE: String = "option_three"
         private const val OPTION_FOUR: String = "option_four"
         private const val OPTION_FIVE: String = "option_five"
+        private const val USER_CHOISE: String = "USER_CHOISE"
+        private const val FIRST_QUESTION: String = "FIRST_QUESTION"
+        private const val LAST_QUESTION: String = "LAST_QUESTION"
+        private const val NUM_OF_QUESTION: String = "NUM_OF_QUESTION"
     }
 
 }
