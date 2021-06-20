@@ -44,10 +44,6 @@ class Quiz (private val questionArray: ArrayList<Question>): Serializable{
         return currentQuestion == quizQuestions.lastIndex
     }
 
-    fun isTrueAnswer(questionNum: Int): Boolean{
-        return quizQuestions[questionNum].userAnswer == quizQuestions[questionNum].question.answerNum
-    }
-
     fun isQuizFinish(): Boolean{
         for (question in quizQuestions){
             if (question.userAnswer == -1){
@@ -86,5 +82,5 @@ class Quiz (private val questionArray: ArrayList<Question>): Serializable{
         return result
     }
 
-    private data class QuestionStatus(val question: Question, var userAnswer: Int)
+    private data class QuestionStatus(val question: Question, var userAnswer: Int): Serializable
 }

@@ -16,9 +16,11 @@ class QuestionsPool(): Serializable{
 
     companion object{
         private val pool = arrayListOf(
-            Question("first", "a","b","c", "d", "i", 1),
-            Question("second", "a","23","c", "d", "i", 2),
-            Question("fourth", "111","b","c", "d", "i", 4)
+            Question("Shoose first", "first","b","c", "d", "e", 1),
+            Question("Shoose second", "a","second","c", "d", "e", 2),
+            Question("Shoose third", "a","b","third", "d", "e", 3),
+            Question("Shoose fourth", "a","b","c", "fourth", "e", 4),
+            Question("Shoose fifth", "a","b","c", "d", "fifth", 5)
         )
 
         fun getQuestions(num: Int = 3): ArrayList<Question>{
