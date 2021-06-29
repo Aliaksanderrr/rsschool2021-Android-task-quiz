@@ -3,19 +3,15 @@ package com.rsschool.quiz
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.res.Resources
-import android.content.res.loader.ResourcesProvider
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.TypedValue
 import android.widget.RadioGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.rsschool.quiz.databinding.ActivityMainBinding
 
-/*Bar color -
-val window = activity?.mindow
-window?.statusBarColor = Color.Red
-*/
-private const val NUMBER_OF_QUESTIONS = 3
+private const val NUMBER_OF_QUESTIONS = 5
 private const val KEY_QUIZ_INSTANCE = "quiz instance"
 
 enum class ActualFragment{
@@ -32,6 +28,11 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons,
                                     R.style.Theme_Quiz_Third,
                                     R.style.Theme_Quiz_Fourth,
                                     R.style.Theme_Quiz_Fifth)
+    private val statusBarColor = listOf(R.color.deep_orange_100_dark,
+                                        R.color.yellow_100_dark,
+                                        R.color.blue_100_dark,
+                                        R.color.cyan_100_dark,
+                                        R.color.light_green_100_dark)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,9 +62,11 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons,
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun openQuizFragment() {
         setTheme(themesPool[quiz.getQuestionNumber()-1])
         val question = quiz.getCurrentQuestion()
+
         val quizFragment = QuizFragment.newInstance(question.question,
                                                     question.variant1,
                                                     question.variant2,
@@ -77,6 +80,10 @@ class MainActivity : AppCompatActivity(), QuizFragment.ClickQuizFragmentButtons,
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.quiz_fragment_container, quizFragment)
         transaction.commit()
+
+        val typedValue = TypedValue()
+        theme.resolveAttribute(R.attr.statusBarBackground, typedValue,true)
+        window.statusBarColor = ContextCompat.getColor(this, statusBarColor[quiz.getQuestionNumber()-1])
         actualFragment = ActualFragment.QUIZ
     }
 
